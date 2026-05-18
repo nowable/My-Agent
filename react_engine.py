@@ -91,7 +91,7 @@ class ReActEngine:
         task_backup = None
 
         for step in range(self.max_steps):
-            model = "mimo-v2-omni" if context_images else config.DEFAULT_MODEL
+            model = config.VISION_MODEL if context_images else config.DEFAULT_MODEL
 
             log.info("react step=%d model=%s images=%d messages=%d",
                      step + 1, model, len(context_images), len(api_messages))
@@ -142,7 +142,7 @@ class ReActEngine:
                 observation = f"错误: 未知工具 '{tool_name}'，可用工具: search, recall_images, create_task"
 
             api_messages.append({"role": "assistant", "content": reply})
-            api_messages.append({"role": "system", "content": f"Observation: {observation}"})
+            api_messages.append({"role": "user", "content": f"Observation: {observation}"})
 
         if not self._task_created:
             task_backup = self._auto_create_task(user_content, user_id, group_id, msg_type)

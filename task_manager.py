@@ -5,11 +5,10 @@ import time
 import uuid
 from datetime import datetime
 
+from . import config
 from .logger import get_logger
 
 log = get_logger(__name__)
-
-TASKS_FILE = "tasks.json"
 
 
 class Task:
@@ -76,10 +75,10 @@ class TaskManager:
         self._start_worker()
 
     def _load(self):
-        if not os.path.exists(TASKS_FILE):
+        if not os.path.exists(config.TASKS_FILE):
             return
         try:
-            with open(TASKS_FILE, "r", encoding="utf-8") as f:
+            with open(config.TASKS_FILE, "r", encoding="utf-8") as f:
                 data = json.load(f)
             with self._lock:
                 self.tasks = [Task.from_dict(t) for t in data if t.get("active")]
@@ -91,8 +90,10 @@ class TaskManager:
         try:
             with self._lock:
                 data = [t.to_dict() for t in self.tasks if t.active]
-            with open(TASKS_FILE, "w", encoding="utf-8") as f:
+            tmp = config.TASKS_FILE + ".tmp"
+            with open(tmp, "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
+            os.replace(tmp, config.TASKS_FILE)
         except Exception:
             log.exception("save tasks failed")
 

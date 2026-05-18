@@ -1,4 +1,4 @@
-from . import llm_api
+from . import config
 from .logger import get_logger
 from .react_engine import ReActEngine
 from .session_manager import SessionManager
@@ -47,7 +47,7 @@ class MessageHandler:
             for seg in msg:
                 if seg.get("type") == "at":
                     qq = seg.get("data", {}).get("qq", "")
-                    if qq == "3361591334":
+                    if qq == config.BOT_QQ:
                         return True
         return False
 
